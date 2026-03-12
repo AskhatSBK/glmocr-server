@@ -1,0 +1,27 @@
+# GLM-OCR Production Server — Python dependencies
+
+# --- Web framework ---
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+gunicorn>=21.2.0
+python-multipart>=0.0.9      # required for FastAPI file uploads
+
+# --- Config ---
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0
+
+# --- GLM-OCR SDK ---
+glmocr
+
+# --- File conversion ---
+pillow>=10.0.0
+pypdfium2>=4.30.0             # PDF → images (no system poppler needed)
+# python-docx is only needed if you want to inspect .docx without LibreOffice
+# LibreOffice (system package) is required for .doc/.docx → PDF conversion
+
+# --- Async task queue (optional) ---
+celery[redis]>=5.3.0
+redis>=5.0.0
+
+# --- Observability (optional but recommended) ---
+# prometheus-fastapi-instrumentator>=6.1.0

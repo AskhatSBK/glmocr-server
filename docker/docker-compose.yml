@@ -1,0 +1,85 @@
+version: "3.9"
+
+# ============================================================
+# Full GLM-OCR stack:
+#   glmocr-api   — FastAPI production server (this repo)
+#   glmocr-model — vLLM serving zai-org/GLM-OCR
+#   redis        — task queue backend (optional async mode)
+# ============================================================
+
+services:
+
+  # --- Model inference server (vLLM) ---
+  glmocr-model:
+    image: vllm/vllm-openai:nightly
+    runtime: nvidia                   # remove if no GPU
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    command: >
+      python -m vllm.entrypoints.openai.api_server
+      --model zai-org/GLM-OCR
+      --port 8080
+      --allowed-local-media-path /
+      --served-model-name glm-ocr
+    ports:
+      - "8080:8080"
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s             # model loading takes time
+
+  # --- Redis (for async jobs) ---
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # --- API server ---
+  glmocr-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../.env
+    environment:
+      - OCR_API_HOST=glmocr-model
+      - OCR_API_PORT=8080
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      glmocr-model:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --- Celery worker (optional, for async /parse/async endpoint) ---
+  glmocr-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2
+    env_file:
+      - ../.env
+    environment:
+      - OCR_API_HOST=glmocr-model
+      - OCR_API_PORT=8080
+      - REDIS_URL=redis://redis:6379/0
+      - USE_TASK_QUEUE=true
+    depends_on:
+      - redis
+      - glmocr-model
+    restart: unless-stopped
+
+volumes:
+  huggingface_cache:
