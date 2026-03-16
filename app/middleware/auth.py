@@ -29,7 +29,7 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         keys = settings.api_keys_set
 
         # Auth disabled — let everything through
-        if not keys:
+        if not settings.ENABLE_AUTH or not keys:
             return await call_next(request)
 
         # Public paths always pass
