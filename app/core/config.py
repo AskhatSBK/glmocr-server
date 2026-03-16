@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     ENABLE_DOCS: bool = True
 
     # --- Auth ---
+    ENABLE_AUTH: bool = False   # set true to enforce API key checks
     # Comma-separated list of valid API keys. Empty = auth disabled (dev only).
     API_KEYS: str = ""
 
