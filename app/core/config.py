@@ -38,23 +38,16 @@ class Settings(BaseSettings):
     def max_file_size_bytes(self) -> int:
         return self.MAX_FILE_SIZE_MB * 1024 * 1024
 
-    # --- GLM-OCR backend ---
-    OCR_API_HOST: str = "localhost"
-    OCR_API_PORT: int = 8080
-    OCR_API_SCHEME: str = "http"
-    OCR_API_KEY: str = ""
-    OCR_CONNECT_TIMEOUT: int = 30
-    OCR_REQUEST_TIMEOUT: int = 300
+    # --- RunPod serverless backend ---
+    RUNPOD_ENDPOINT_URL: str = ""   # https://api.runpod.ai/v2/<endpoint_id>
+    RUNPOD_API_KEY: str = ""
+    RUNPOD_TIMEOUT: int = 300       # seconds to wait for job completion
 
     # --- Output ---
     OUTPUT_FORMAT: str = "both"   # json | markdown | both
 
     # --- CORS ---
     CORS_ORIGINS: List[str] = ["*"]
-
-    # --- Async job queue (optional Celery) ---
-    REDIS_URL: str = "redis://localhost:6379/0"
-    USE_TASK_QUEUE: bool = False
 
 
 settings = Settings()

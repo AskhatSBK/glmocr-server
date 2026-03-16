@@ -20,7 +20,7 @@ from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
-from app.core.ocr_service import ocr_service
+from app.core.runpod_ocr_service import ocr_service
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ async def health():
     """Liveness + basic readiness probe."""
     return {
         "status": "ok",
-        "ocr_backend": f"{settings.OCR_API_SCHEME}://{settings.OCR_API_HOST}:{settings.OCR_API_PORT}",
+        "ocr_backend": settings.RUNPOD_ENDPOINT_URL or "runpod-not-configured",
         "supported_formats": settings.ALLOWED_EXTENSIONS,
         "max_file_size_mb": settings.MAX_FILE_SIZE_MB,
     }
