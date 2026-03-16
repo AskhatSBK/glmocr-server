@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-ALLOWED_EXTENSIONS = set(settings.ALLOWED_EXTENSIONS)
+ALLOWED_EXTENSIONS = set(settings.allowed_extensions_list)
 ALLOWED_MIME_TYPES = {
     "application/pdf",
     "image/jpeg",
@@ -101,7 +101,7 @@ async def health():
     return {
         "status": "ok",
         "ocr_backend": settings.RUNPOD_ENDPOINT_URL or "runpod-not-configured",
-        "supported_formats": settings.ALLOWED_EXTENSIONS,
+        "supported_formats": settings.allowed_extensions_list,
         "max_file_size_mb": settings.MAX_FILE_SIZE_MB,
     }
 
