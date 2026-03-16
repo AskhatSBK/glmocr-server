@@ -32,7 +32,12 @@ class Settings(BaseSettings):
 
     # --- File upload ---
     MAX_FILE_SIZE_MB: int = 50
-    ALLOWED_EXTENSIONS: List[str] = [".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx"]
+    # Comma-separated: .pdf,.jpg,.jpeg,.png,.doc,.docx
+    ALLOWED_EXTENSIONS: str = ".pdf,.jpg,.jpeg,.png,.doc,.docx"
+
+    @property
+    def allowed_extensions_list(self) -> List[str]:
+        return [e.strip() for e in self.ALLOWED_EXTENSIONS.split(",") if e.strip()]
 
     @property
     def max_file_size_bytes(self) -> int:
@@ -50,7 +55,12 @@ class Settings(BaseSettings):
     OUTPUT_FORMAT: str = "both"   # json | markdown | both
 
     # --- CORS ---
-    CORS_ORIGINS: List[str] = ["*"]
+    # Comma-separated origins, or * for all
+    CORS_ORIGINS: str = "*"
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
 
     # --- Async job queue (optional Celery) ---
     REDIS_URL: str = "redis://localhost:6379/0"
