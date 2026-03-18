@@ -65,11 +65,16 @@ class OCRService:
         """Lazy-initialise GlmOcr (imports are slow at module load time)."""
         if self._parser is None:
             try:
+                import os
                 from glmocr import GlmOcr
+                # SDK reads selfhosted model name only from this env var
+                os.environ.setdefault("GLMOCR_OCR_MODEL", settings.OCR_MODEL)
                 self._parser = GlmOcr(
+                    mode=settings.OCR_MODE,
                     ocr_api_host=settings.OCR_API_HOST,
                     ocr_api_port=settings.OCR_API_PORT,
                     api_key=settings.OCR_API_KEY or None,
+                    enable_layout=settings.OCR_ENABLE_LAYOUT,
                     timeout=settings.OCR_REQUEST_TIMEOUT,
                 )
                 logger.info("GlmOcr parser initialised successfully.")
@@ -106,9 +111,12 @@ class OCRService:
 
             elapsed = time.perf_counter() - start
 
-            # 4. Extract outputs
-            markdown = getattr(raw_result, "markdown", None)
-            json_result = getattr(raw_result, "json_result", None)
+            # 4. Extract outputs — parse() returns a list when given a list
+            results = raw_result if isinstance(raw_result, list) else [raw_result]
+            md_parts = [r.markdown_result for r in results if getattr(r, "markdown_result", None)]
+            json_parts = [r.json_result for r in results if getattr(r, "json_result", None)]
+            markdown = "\n\n".join(md_parts) if md_parts else None
+            json_result = json_parts if json_parts else None
 
             return OCRResult(
                 filename=original_filename,

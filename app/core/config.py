@@ -45,13 +45,15 @@ class Settings(BaseSettings):
         return self.MAX_FILE_SIZE_MB * 1024 * 1024
 
     # --- GLM-OCR backend ---
-    OCR_API_HOST: str = "localhost"
-    OCR_API_PORT: int = 8080
+    OCR_MODE: str = "selfhosted"          # selfhosted | maas
+    OCR_API_HOST: str = "192.168.90.10"
+    OCR_API_PORT: int = 8888
     OCR_API_SCHEME: str = "http"
-    OCR_API_KEY: str = ""
+    OCR_API_KEY: str = ""                 # required for maas mode
+    OCR_MODEL: str = "glm-ocr"   # model name served by vLLM
     OCR_CONNECT_TIMEOUT: int = 30
     OCR_REQUEST_TIMEOUT: int = 300
-
+    OCR_ENABLE_LAYOUT: bool = False
     # --- Output ---
     OUTPUT_FORMAT: str = "both"   # json | markdown | both
 
@@ -65,7 +67,7 @@ class Settings(BaseSettings):
 
     # --- Async job queue (optional Celery) ---
     REDIS_URL: str = "redis://localhost:6379/0"
-    USE_TASK_QUEUE: bool = False
+    USE_TASK_QUEUE: bool = True
 
 
 settings = Settings()
