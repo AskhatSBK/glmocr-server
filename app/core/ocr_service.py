@@ -60,32 +60,18 @@ class OCRService:
 
     def __init__(self) -> None:
         self._parser = None
-        self._glmocr_config = self._build_glmocr_config()
-
-    def _build_glmocr_config(self) -> Dict[str, Any]:
-        """Build the config dict that GlmOcr accepts."""
-        return {
-            "pipeline": {
-                "ocr_api": {
-                    "api_host": settings.OCR_API_HOST,
-                    "api_port": settings.OCR_API_PORT,
-                    "api_scheme": settings.OCR_API_SCHEME,
-                    "api_key": settings.OCR_API_KEY or None,
-                    "connect_timeout": settings.OCR_CONNECT_TIMEOUT,
-                    "request_timeout": settings.OCR_REQUEST_TIMEOUT,
-                },
-                "result_formatter": {
-                    "output_format": settings.OUTPUT_FORMAT,
-                },
-            }
-        }
 
     def _get_parser(self):
         """Lazy-initialise GlmOcr (imports are slow at module load time)."""
         if self._parser is None:
             try:
                 from glmocr import GlmOcr
-                self._parser = GlmOcr(config=self._glmocr_config)
+                self._parser = GlmOcr(
+                    ocr_api_host=settings.OCR_API_HOST,
+                    ocr_api_port=settings.OCR_API_PORT,
+                    api_key=settings.OCR_API_KEY or None,
+                    timeout=settings.OCR_REQUEST_TIMEOUT,
+                )
                 logger.info("GlmOcr parser initialised successfully.")
             except Exception as exc:
                 logger.error("Failed to initialise GlmOcr: %s", exc)
