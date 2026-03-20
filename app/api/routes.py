@@ -173,11 +173,20 @@ async def parse_file_async(
     suffix = Path(file.filename or "file").suffix.lower()
     original_name = file.filename or f"upload{suffix}"
 
+    # Save to a persistent temp file — pass path (not bytes) through Redis
+    tmp = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
+    try:
+        tmp.write(content)
+        tmp.close()
+    except Exception:
+        os.unlink(tmp.name)
+        raise
+
     from app.workers.tasks import run_ocr_task  # only import when queue is enabled
 
     job_id = str(uuid.uuid4())
     run_ocr_task.apply_async(
-        args=[content, original_name, suffix],
+        args=[tmp.name, original_name],
         task_id=job_id,
     )
 

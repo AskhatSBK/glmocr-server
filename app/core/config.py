@@ -68,6 +68,11 @@ class Settings(BaseSettings):
     # --- Async job queue (optional Celery) ---
     REDIS_URL: str = "redis://localhost:6379/0"
     USE_TASK_QUEUE: bool = True
+    CELERY_WORKER_CONCURRENCY: int = 2          # max parallel tasks per worker
+    CELERY_WORKER_MAX_MEMORY_KB: int = 512_000  # ~500 MB, worker restarts if exceeded
+    CELERY_RESULT_EXPIRES: int = 3600           # seconds to keep results in Redis
+    CELERY_TASK_TIME_LIMIT: int = 600           # hard kill after N seconds
+    CELERY_TASK_SOFT_TIME_LIMIT: int = 540      # raise SoftTimeLimitExceeded after N seconds
 
 
 settings = Settings()
