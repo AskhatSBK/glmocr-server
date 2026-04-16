@@ -16,6 +16,7 @@ glmocr
 # --- File conversion ---
 pillow>=10.0.0
 pypdfium2>=4.30.0             # PDF → images (no system poppler needed)
+numpy>=1.24.0                 # deskew detection in image preprocessing
 # python-docx is only needed if you want to inspect .docx without LibreOffice
 # LibreOffice (system package) is required for .doc/.docx → PDF conversion
 

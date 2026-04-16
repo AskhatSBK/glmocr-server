@@ -53,7 +53,11 @@ class Settings(BaseSettings):
     OCR_MODEL: str = "glm-ocr"   # model name served by vLLM
     OCR_CONNECT_TIMEOUT: int = 30
     OCR_REQUEST_TIMEOUT: int = 300
-    OCR_ENABLE_LAYOUT: bool = False
+    OCR_ENABLE_LAYOUT: bool = True
+    # --- Image preprocessing ---
+    PDF_DPI: int = 200                  # render resolution for PDF/DOCX pages
+    PREPROCESS_IMAGES: bool = True      # deskew + contrast + sharpen before OCR
+
     # --- Output ---
     OUTPUT_FORMAT: str = "both"   # json | markdown | both
 

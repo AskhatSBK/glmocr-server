@@ -144,11 +144,11 @@ class OCRService:
 # ---------------------------------------------------------------------------
 
 def _save_images(images: List[Image.Image], directory: str) -> List[str]:
-    """Save PIL images to directory as JPEGs and return sorted path list."""
+    """Save PIL images to directory as lossless PNGs and return sorted path list."""
     paths = []
     for i, img in enumerate(images):
-        p = os.path.join(directory, f"page_{i:04d}.jpg")
-        img.save(p, format="JPEG", quality=95)
+        p = os.path.join(directory, f"page_{i:04d}.png")
+        img.save(p, format="PNG")
         paths.append(p)
     return paths
 
